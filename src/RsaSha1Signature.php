@@ -67,9 +67,9 @@ class RsaSha1Signature extends Signature implements SignatureInterface
 
         $schemeHostPath = Url::buildUrl([
             'scheme' => $url->getScheme(),
-            'host'   => $url->getHost(),
-            'port'   => $url->getPort(),
-            'path'   => $url->getPath(),
+            'host' => $url->getHost(),
+            'port' => $url->getPort(),
+            'path' => $url->getPath(),
         ]);
 
         $baseString .= rawurlencode($schemeHostPath).'&';
