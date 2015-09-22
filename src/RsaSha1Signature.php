@@ -27,6 +27,10 @@ class RsaSha1Signature extends Signature implements SignatureInterface
         // Fetch the private key cert based on the request
         $certificate = openssl_pkey_get_private('file://'.storage_path().'/app/keys/jira.pem');
 
+        if ($certificate === false) {
+            throw new \Exception("Cannot get private key.");
+        }
+
         // Pull the private key ID from the certificate
         $privatekeyid = openssl_get_privatekey($certificate);
 

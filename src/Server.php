@@ -11,6 +11,8 @@ class Server extends BaseServer
 {
     const JIRA_BASE_URL = 'http://example.jira.com';
 
+    private $jiraBaseUrl;
+
     /**
      * Create a new server instance.
      *
@@ -23,6 +25,7 @@ class Server extends BaseServer
     {
         // Pass through an array or client credentials, we don't care
         if (is_array($clientCredentials)) {
+            $this->jiraBaseUrl = isset($clientCredentials['base_url']) ? $clientCredentials['base_url'] : null;
             $clientCredentials = $this->createClientCredentials($clientCredentials);
         } elseif (!$clientCredentials instanceof ClientCredentialsInterface) {
             throw new \InvalidArgumentException('Client credentials must be an array or valid object.');
@@ -32,6 +35,16 @@ class Server extends BaseServer
 
         // !! RsaSha1Signature for Jira
         $this->signature = $signature ?: new RsaSha1Signature($clientCredentials);
+    }
+
+    /**
+     * Get JIRA base URL
+     *
+     * @return string
+     */
+    public function getJiraBaseUrl()
+    {
+        return empty($this->jiraBaseUrl) ? self::JIRA_BASE_URL : $this->jiraBaseUrl;
     }
 
     /**
