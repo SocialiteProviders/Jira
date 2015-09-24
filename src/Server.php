@@ -11,6 +11,9 @@ class Server extends BaseServer
 {
     const JIRA_BASE_URL = 'http://example.jira.com';
 
+    private $jiraBaseUrl;
+    private $jiraCertPath;
+
     /**
      * Create a new server instance.
      *
@@ -23,6 +26,8 @@ class Server extends BaseServer
     {
         // Pass through an array or client credentials, we don't care
         if (is_array($clientCredentials)) {
+            $this->jiraBaseUrl = isset($clientCredentials['base_url']) ? $clientCredentials['base_url'] : null;
+            $this->jiraCertPath = isset($clientCredentials['cert']) ? $clientCredentials['cert'] : storage_path().'/app/keys/jira.pem';
             $clientCredentials = $this->createClientCredentials($clientCredentials);
         } elseif (!$clientCredentials instanceof ClientCredentialsInterface) {
             throw new \InvalidArgumentException('Client credentials must be an array or valid object.');
@@ -32,6 +37,16 @@ class Server extends BaseServer
 
         // !! RsaSha1Signature for Jira
         $this->signature = $signature ?: new RsaSha1Signature($clientCredentials);
+    }
+
+    /**
+     * Get JIRA base URL.
+     *
+     * @return string
+     */
+    public function getJiraBaseUrl()
+    {
+        return empty($this->jiraBaseUrl) ? self::JIRA_BASE_URL : $this->jiraBaseUrl;
     }
 
     /**
@@ -47,13 +62,13 @@ class Server extends BaseServer
         $parameters = $this->baseProtocolParameters();
 
         // without 'oauth_callback'
-        $parameters['oauth_signature'] = $this->signature->sign($uri, $parameters, 'POST');
+        $parameters['oauth_signature'] = $this->signature->sign($uri, $parameters, 'POST', $this->$jiraCertPath);
 
         return $this->normalizeProtocolParameters($parameters);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function urlTemporaryCredentials()
     {
@@ -62,7 +77,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function urlAuthorization()
     {
@@ -70,7 +85,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function urlTokenCredentials()
     {
@@ -78,7 +93,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function urlUserDetails()
     {
@@ -86,7 +101,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
@@ -94,7 +109,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function userUid($data, TokenCredentials $tokenCredentials)
     {
@@ -102,7 +117,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function userScreenName($data, TokenCredentials $tokenCredentials)
     {
@@ -110,7 +125,7 @@ class Server extends BaseServer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function userEmail($data, TokenCredentials $tokenCredentials)
     {

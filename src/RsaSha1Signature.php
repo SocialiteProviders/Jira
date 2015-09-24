@@ -9,7 +9,7 @@ use Guzzle\Http\Url;
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function method()
     {
@@ -17,15 +17,26 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Sign the given request for the client.
+     *
+     * @param string $uri
+     * @param array  $parameters
+     * @param string $method
+     * @param string $certPath
+     *
+     * @return string
      */
-    public function sign($uri, array $parameters = [], $method = 'POST')
+    public function sign($uri, array $parameters = [], $method = 'POST', $certPath = '')
     {
         $url = $this->createUrl($uri);
         $baseString = $this->baseString($url, $method, $parameters);
 
         // Fetch the private key cert based on the request
-        $certificate = openssl_pkey_get_private('file://'.storage_path().'/app/keys/jira.pem');
+        $certificate = openssl_pkey_get_private("file://$certPath");
+
+        if ($certificate === false) {
+            throw new \Exception('Cannot get private key.');
+        }
 
         // Pull the private key ID from the certificate
         $privatekeyid = openssl_get_privatekey($certificate);
