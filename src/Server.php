@@ -12,6 +12,7 @@ class Server extends BaseServer
     const JIRA_BASE_URL = 'http://example.jira.com';
 
     private $jiraBaseUrl;
+    private $jiraCertPath;
 
     /**
      * Create a new server instance.
@@ -26,6 +27,7 @@ class Server extends BaseServer
         // Pass through an array or client credentials, we don't care
         if (is_array($clientCredentials)) {
             $this->jiraBaseUrl = isset($clientCredentials['base_url']) ? $clientCredentials['base_url'] : null;
+            $this->jiraCertPath = isset($clientCredentials['cert']) ? $clientCredentials['cert'] : storage_path().'/app/keys/jira.pem';
             $clientCredentials = $this->createClientCredentials($clientCredentials);
         } elseif (!$clientCredentials instanceof ClientCredentialsInterface) {
             throw new \InvalidArgumentException('Client credentials must be an array or valid object.');
@@ -60,7 +62,7 @@ class Server extends BaseServer
         $parameters = $this->baseProtocolParameters();
 
         // without 'oauth_callback'
-        $parameters['oauth_signature'] = $this->signature->sign($uri, $parameters, 'POST');
+        $parameters['oauth_signature'] = $this->signature->sign($uri, $parameters, 'POST', $this->$jiraCertPath);
 
         return $this->normalizeProtocolParameters($parameters);
     }
