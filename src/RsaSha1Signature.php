@@ -9,7 +9,7 @@ use Guzzle\Http\Url;
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function method()
     {
@@ -17,7 +17,7 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function sign($uri, array $parameters = [], $method = 'POST')
     {

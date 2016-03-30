@@ -2,13 +2,18 @@
 
 namespace SocialiteProviders\Jira;
 
-use Laravel\Socialite\One\AbstractProvider;
-use Laravel\Socialite\One\User;
+use SocialiteProviders\Manager\OAuth1\AbstractProvider;
+use SocialiteProviders\Manager\OAuth1\User;
 
 class Provider extends AbstractProvider
 {
     /**
-     * {@inheritDoc}
+     * Unique Provider Identifier.
+     */
+    const IDENTIFIER = 'JIRA';
+
+    /**
+     * {@inheritdoc}
      */
     public function user()
     {
