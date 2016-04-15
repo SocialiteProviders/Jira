@@ -112,12 +112,7 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        $user = new User();
-
-        $user->email = isset($data['email']) ? $data['email'] : null;
-        $user->name = isset($data['name']) ? $data['name'] : null;
-
-        return $user;
+        return $data;
     }
 
     /**
