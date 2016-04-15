@@ -2,14 +2,19 @@
 
 namespace SocialiteProviders\Jira;
 
-use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
 use League\OAuth1\Client\Credentials\TokenCredentials;
+use League\OAuth1\Client\Server\Server as BaseServer;
 use League\OAuth1\Client\Signature\SignatureInterface;
-use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
+use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
+use League\OAuth1\Client\Server\User;
 
 class Server extends BaseServer
 {
     const JIRA_BASE_URL = 'http://example.jira.com';
+
+    private $jiraBaseUrl;
+    private $jiraCertPath;
+    private $jiraUserDetailsUrl;
 
     /**
      * Create a new server instance.
@@ -23,6 +28,12 @@ class Server extends BaseServer
     {
         // Pass through an array or client credentials, we don't care
         if (is_array($clientCredentials)) {
+            $this->jiraBaseUrl = array_get($clientCredentials, 'base_url');
+
+            $this->jiraUserDetailsUrl = array_get($clientCredentials, 'user_details_url');
+
+            $this->jiraCertPath = array_get($clientCredentials, 'cert', $this->getConfig('cert_path', storage_path().'/app/keys/jira.pem'));
+
             $clientCredentials = $this->createClientCredentials($clientCredentials);
         } elseif (!$clientCredentials instanceof ClientCredentialsInterface) {
             throw new \InvalidArgumentException('Client credentials must be an array or valid object.');
@@ -32,6 +43,17 @@ class Server extends BaseServer
 
         // !! RsaSha1Signature for Jira
         $this->signature = $signature ?: new RsaSha1Signature($clientCredentials);
+        $this->signature->setCertPath($this->jiraCertPath);
+    }
+
+    /**
+     * Get JIRA base URL.
+     *
+     * @return string
+     */
+    public function getJiraBaseUrl()
+    {
+        return $this->getConfig('base_uri', self::JIRA_BASE_URL);
     }
 
     /**
@@ -57,7 +79,7 @@ class Server extends BaseServer
      */
     public function urlTemporaryCredentials()
     {
-        return self::JIRA_BASE_URL.'/plugins/servlet/oauth/request-token?oauth_callback='.
+        return $this->getJiraBaseUrl().'/plugins/servlet/oauth/request-token?oauth_callback='.
             rawurlencode($this->clientCredentials->getCallbackUri());
     }
 
@@ -66,7 +88,7 @@ class Server extends BaseServer
      */
     public function urlAuthorization()
     {
-        return self::JIRA_BASE_URL.'/plugins/servlet/oauth/authorize';
+        return $this->getJiraBaseUrl().'/plugins/servlet/oauth/authorize';
     }
 
     /**
@@ -74,7 +96,7 @@ class Server extends BaseServer
      */
     public function urlTokenCredentials()
     {
-        return self::JIRA_BASE_URL.'/plugins/servlet/oauth/access-token';
+        return $this->getJiraBaseUrl().'/plugins/servlet/oauth/access-token';
     }
 
     /**
@@ -82,7 +104,7 @@ class Server extends BaseServer
      */
     public function urlUserDetails()
     {
-        return self::JIRA_BASE_URL.'/rest/api/2/myself';
+        return empty($this->jiraUserDetailsUrl) ? $this->getJiraBaseUrl().'/rest/api/2/myself' : $this->jiraUserDetailsUrl;
     }
 
     /**
@@ -90,7 +112,12 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        return $data;
+        $user = new User();
+
+        $user->email = isset($data['email']) ? $data['email'] : null;
+        $user->name = isset($data['name']) ? $data['name'] : null;
+
+        return $user;
     }
 
     /**
@@ -115,5 +142,10 @@ class Server extends BaseServer
     public function userEmail($data, TokenCredentials $tokenCredentials)
     {
         return $data['email'];
+    }
+
+    public static function additionalConfigKeys()
+    {
+        return ['base_uri', 'cert_path'];
     }
 }

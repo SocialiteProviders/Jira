@@ -8,6 +8,8 @@ use Guzzle\Http\Url;
 
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
+    private $certPath = '';
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +27,11 @@ class RsaSha1Signature extends Signature implements SignatureInterface
         $baseString = $this->baseString($url, $method, $parameters);
 
         // Fetch the private key cert based on the request
-        $certificate = openssl_pkey_get_private('file://'.storage_path().'/app/keys/jira.pem');
+        $certificate = openssl_pkey_get_private("file://$this->certPath");
+
+        if ($certificate === false) {
+            throw new \Exception('Cannot get private key.');
+        }
 
         // Pull the private key ID from the certificate
         $privatekeyid = openssl_get_privatekey($certificate);
@@ -37,6 +43,16 @@ class RsaSha1Signature extends Signature implements SignatureInterface
         openssl_free_key($privatekeyid);
 
         return base64_encode($signature);
+    }
+
+    /**
+     * Set cert path
+     *
+     * @param $certPath
+     */
+    public function setCertPath($certPath)
+    {
+        $this->certPath = $certPath;
     }
 
     /**
