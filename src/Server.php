@@ -3,10 +3,10 @@
 namespace SocialiteProviders\Jira;
 
 use League\OAuth1\Client\Credentials\TokenCredentials;
-use League\OAuth1\Client\Server\Server as BaseServer;
 use League\OAuth1\Client\Signature\SignatureInterface;
 use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
-use League\OAuth1\Client\Server\User;
+use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
+use SocialiteProviders\Manager\OAuth1\User;
 
 class Server extends BaseServer
 {
