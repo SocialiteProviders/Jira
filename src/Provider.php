@@ -12,9 +12,9 @@ class Provider extends AbstractProvider
      */
     const IDENTIFIER = 'JIRA';
 
-    /**
-     * {@inheritdoc}
-     */
+     /**
+      * {@inheritdoc}
+      */
      protected function mapUserToObject(array $user)
      {
          $userObject = new User();

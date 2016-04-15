@@ -6,7 +6,6 @@ use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Signature\SignatureInterface;
 use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
-use SocialiteProviders\Manager\OAuth1\User;
 
 class Server extends BaseServer
 {

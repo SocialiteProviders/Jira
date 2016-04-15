@@ -46,7 +46,7 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     }
 
     /**
-     * Set cert path
+     * Set cert path.
      *
      * @param $certPath
      */
