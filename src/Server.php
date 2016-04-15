@@ -143,9 +143,4 @@ class Server extends BaseServer
     {
         return $data['email'];
     }
-
-    public static function additionalConfigKeys()
-    {
-        return ['base_uri', 'cert_path'];
-    }
 }

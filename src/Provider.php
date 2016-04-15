@@ -23,4 +23,9 @@ class Provider extends AbstractProvider
             'avatar' => array_get($user, 'avatar'),
         ]);
     }
+    
+    public static function additionalConfigKeys()
+    {
+        return ['base_uri', 'cert_path'];
+    }
 }
