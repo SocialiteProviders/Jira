@@ -4,7 +4,6 @@ namespace SocialiteProviders\Jira;
 
 use League\OAuth1\Client\Signature\Signature;
 use League\OAuth1\Client\Signature\SignatureInterface;
-use GuzzleHttp\Client;
 
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
