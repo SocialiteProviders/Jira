@@ -4,7 +4,7 @@ namespace SocialiteProviders\Jira;
 
 use League\OAuth1\Client\Signature\Signature;
 use League\OAuth1\Client\Signature\SignatureInterface;
-use Guzzle\Http\Url;
+use GuzzleHttp\Client;
 
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
@@ -64,7 +64,8 @@ class RsaSha1Signature extends Signature implements SignatureInterface
      */
     protected function createUrl($uri)
     {
-        return Url::factory($uri);
+        $theUri = new \GuzzleHttp\Psr7\Uri($uri);
+        return $theUri;
     }
 
     /**
@@ -80,14 +81,13 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     protected function baseString(Url $url, $method = 'POST', array $parameters = [])
     {
         $baseString = rawurlencode($method).'&';
-
-        $schemeHostPath = Url::buildUrl([
-            'scheme' => $url->getScheme(),
-            'host' => $url->getHost(),
-            'port' => $url->getPort(),
-            'path' => $url->getPath(),
-        ]);
-
+        $schemeHostPath = $url->getScheme() . "://" . $url->getHost();
+        if ($url->getPort() != "") {
+            $schemeHostPath .= ":" . $url->getPort();
+        }
+        if ($url->getPath() != "") {
+            $schemeHostPath .= $url->getPath();
+        }
         $baseString .= rawurlencode($schemeHostPath).'&';
 
         $data = [];
