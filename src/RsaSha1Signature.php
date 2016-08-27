@@ -64,6 +64,7 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     protected function createUrl($uri)
     {
         $theUri = new \GuzzleHttp\Psr7\Uri($uri);
+
         return $theUri;
     }
 
