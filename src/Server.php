@@ -77,11 +77,13 @@ class Server extends BaseServer
             return $this->handleTokenCredentialsBadResponse($e);
         }
         $responseString = (string) $response->getBody();
+
         return [
             'tokenCredentials' => $this->createTokenCredentials($responseString),
             'credentialsResponseBody' => $responseString,
         ];
     }
+
     /**
      * Get JIRA base URL.
      *
