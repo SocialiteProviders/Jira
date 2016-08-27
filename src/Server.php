@@ -65,7 +65,7 @@ class Server extends BaseServer
             );
         }
         // oauth_verifier must be at the end of the url, this doesn't seem to work otherwise
-        $uri            = $this->urlTokenCredentials() . '?oauth_verifier=' . $verifier;
+        $uri = $this->urlTokenCredentials().'?oauth_verifier='.$verifier;
         $bodyParameters = ['oauth_verifier' => $verifier, 'oauth_token' => $temporaryIdentifier];
 
         $client = $this->createHttpClient();
@@ -78,7 +78,7 @@ class Server extends BaseServer
         }
         $responseString = (string) $response->getBody();
         return [
-            'tokenCredentials'        => $this->createTokenCredentials($responseString),
+            'tokenCredentials' => $this->createTokenCredentials($responseString),
             'credentialsResponseBody' => $responseString,
         ];
     }
