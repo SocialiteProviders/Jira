@@ -81,11 +81,11 @@ class RsaSha1Signature extends Signature implements SignatureInterface
     protected function baseString(Url $url, $method = 'POST', array $parameters = [])
     {
         $baseString = rawurlencode($method).'&';
-        $schemeHostPath = $url->getScheme() . "://" . $url->getHost();
-        if ($url->getPort() != "") {
-            $schemeHostPath .= ":" . $url->getPort();
+        $schemeHostPath = $url->getScheme()."://".$url->getHost();
+        if ($url->getPort() != '') {
+            $schemeHostPath .= ":".$url->getPort();
         }
-        if ($url->getPath() != "") {
+        if ($url->getPath() != '') {
             $schemeHostPath .= $url->getPath();
         }
         $baseString .= rawurlencode($schemeHostPath).'&';
