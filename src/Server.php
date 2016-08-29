@@ -2,9 +2,9 @@
 
 namespace SocialiteProviders\Jira;
 
+use League\OAuth1\Client\Credentials\TemporaryCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Signature\SignatureInterface;
-use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
 
 class Server extends BaseServer
@@ -43,6 +43,45 @@ class Server extends BaseServer
         // !! RsaSha1Signature for Jira
         $this->signature = $signature ?: new RsaSha1Signature($clientCredentials);
         $this->signature->setCertPath($this->jiraCertPath);
+    }
+
+    /**
+     * Retrieves token credentials by passing in the temporary credentials,
+     * the temporary credentials identifier as passed back by the server
+     * and finally the verifier code.
+     *
+     * @param TemporaryCredentials $temporaryCredentials
+     * @param string               $temporaryIdentifier
+     * @param string               $verifier
+     *
+     * @return TokenCredentials
+     */
+    public function getTokenCredentials(TemporaryCredentials $temporaryCredentials, $temporaryIdentifier, $verifier)
+    {
+        if ($temporaryIdentifier !== $temporaryCredentials->getIdentifier()) {
+            throw new \InvalidArgumentException(
+                'Temporary identifier passed back by server does not match that of stored temporary credentials.
+                Potential man-in-the-middle.'
+            );
+        }
+        // oauth_verifier must be at the end of the url, this doesn't seem to work otherwise
+        $uri = $this->urlTokenCredentials().'?oauth_verifier='.$verifier;
+        $bodyParameters = ['oauth_verifier' => $verifier, 'oauth_token' => $temporaryIdentifier];
+
+        $client = $this->createHttpClient();
+
+        $headers = $this->getHeaders($temporaryCredentials, 'POST', $uri, $bodyParameters);
+        try {
+            $response = $client->post($uri, ['headers' => $headers], ['body' => $bodyParameters]);
+        } catch (BadResponseException $e) {
+            return $this->handleTokenCredentialsBadResponse($e);
+        }
+        $responseString = (string) $response->getBody();
+
+        return [
+            'tokenCredentials' => $this->createTokenCredentials($responseString),
+            'credentialsResponseBody' => $responseString,
+        ];
     }
 
     /**
