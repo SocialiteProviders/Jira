@@ -4,6 +4,7 @@ namespace SocialiteProviders\Jira;
 
 use League\OAuth1\Client\Signature\Signature;
 use League\OAuth1\Client\Signature\SignatureInterface;
+use GuzzleHttp\Psr7\Uri;
 
 class RsaSha1Signature extends Signature implements SignatureInterface
 {
@@ -59,11 +60,11 @@ class RsaSha1Signature extends Signature implements SignatureInterface
      *
      * @param string $uri
      *
-     * @return Url
+     * @return Uri
      */
     protected function createUrl($uri)
     {
-        $theUri = new \GuzzleHttp\Psr7\Uri($uri);
+        $theUri = new Uri($uri);
 
         return $theUri;
     }
@@ -72,13 +73,13 @@ class RsaSha1Signature extends Signature implements SignatureInterface
      * Generate a base string for a RSA-SHA1 signature
      * based on the given a url, method, and any parameters.
      *
-     * @param Url    $url
+     * @param Uri    $url
      * @param string $method
      * @param array  $parameters
      *
      * @return string
      */
-    protected function baseString(Url $url, $method = 'POST', array $parameters = [])
+    protected function baseString(Uri $url, $method = 'POST', array $parameters = [])
     {
         $baseString = rawurlencode($method).'&';
         $schemeHostPath = $url->getScheme().'://'.$url->getHost();
